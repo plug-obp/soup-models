@@ -9,12 +9,12 @@ idling = let
 		   && (!bobFlagUP -> (!<> bobCS)) )
 */
 var status = true; pc = 0
-| z2ze       : [     pc == 0 ]
-| z2on       : [     pc == 0 ∧ !(@a==1) ] / pc = 1
-| z2tw       : [     pc == 0 ∧ !(@b==1) ] / pc = 2
-| z2th       : [     pc == 0 ∧ ((@a!=1 && @a==2) || (@b!=1 && @b==2)) ] / pc = 3
+| z2ze       : [pc == 0 ]
+| z2on       : [pc == 0 ∧ !(@a==1) ] / pc = 1
+| z2tw       : [pc == 0 ∧ !(@b==1) ] / pc = 2
+| z2th       : [pc == 0 ∧ ((@a!=1 && @a==2) || (@b!=1 && @b==2)) ] / pc = 3
 | on2on      : [pc == 1]
 | tw2tw      : [pc == 2]
-| o2th       : [pc == 1  ∧ (@a==2)] / pc = 3; status = false
-| tw2th      : [pc == 2  ∧ (@a==2)] / pc = 3; status = false
+| o2th       : [pc == 1 ∧ (@a==2)] / pc = 3; status = false
+| tw2th      : [pc == 2 ∧ (@a==2)] / pc = 3; status = false
 | th2th      : [pc == 2]
