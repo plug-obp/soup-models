@@ -9,8 +9,8 @@ var a = 0; b = 0; turn = 0
 | b_i2w: [ b == 0 ] /
     b = 1;
     turn = 0;
-| a_w2c: [ a == 1 ∧ (turn == 0 || b != 1)  ] / a = 2
-| b_w2c: [ b == 1 ∧ (turn == 1 || a != 1) ] / b = 2
+| a_w2c: [ a == 1 ∧ (turn == 0 || b == 0)  ] / a = 2
+| b_w2c: [ b == 1 ∧ (turn == 1 || a == 0) ] / b = 2
 | a_c2i: [ a == 2 ] /
     a = 0;
 | b_c2i: [ b == 2 ] /
