@@ -2,6 +2,9 @@
 // solution 3 does not violate the 'no-deadlock' `meta-`property
 // but still contains a livelock
 // here we try to solve the problem through the petterson algorithm, here without flags
+//The problem is that without flags or past LTL operators we cannot encode the flagDiscipline property G(a==2 -> P(a==1))
+// However, we can encode the property G(a==2 -> P(a==1)) using a buchi automaton with a witness variable (remembering that the flag was raised)
+// we can encode that as a dependent soup
 var a = 0; b = 0; turn = 0 
 | a_i2w: [ a == 0 ] / 
     a = 1;
