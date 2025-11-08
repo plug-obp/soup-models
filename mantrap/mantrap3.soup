@@ -1,0 +1,64 @@
+/*
+var
+    d1 = 0;   // 0=closed, 1=open, 2=completed_sequence
+    d2 = 0;
+    authorized= false;
+    mustOpenD1= true;
+    sequence_phase = 0;  // 0=need_door1, 1=need_door2
+
+// Door 1 - can open when: its turn AND we're in phase 0 (need door1)
+| d1_c2o: [d1==0 ∧ authorized ∧ d2 ≠ 1 ∧ mustOpenD1 ∧ sequence_phase==0] /
+    d1=1; sequence_phase=1
+| d1_o2sc: [d1==1] / d1=0  // Mark sequence completion
+
+// Door 2 - can open when: its turn AND we're in phase 1 (need door2) AND door1 closed
+| d2_c2o: [d2==0 ∧ authorized ∧ d1 ≠ 1 ∧ !mustOpenD1 ∧ sequence_phase==1] /
+    d2=1; mustOpenD1=true; sequence_phase=0
+| d2_o2c: [d2==1] / d2=0
+
+// Emergency sequence reset - if stuck needing door1 but it's not door1's turn
+| reset_d1: [d1==0 ∧ d2==0 ∧ sequence_phase==0 ∧ !mustOpenD1] / mustOpenD1=true
+
+// Emergency bypass - if door1 stuck, allow door2 directly (preserves fairness)
+| emergency_d2: [d2==0 ∧ d1==0 ∧ mustOpenD1 ∧ sequence_phase==1] /
+     sequence_phase=0 //d2=1; mustOpenD1=false;
+
+// Authorization response - door1 closes if unauthorized (even if "in sequence")
+| d1_force_close: [d1==1 ∧ !authorized] / d1=0
+
+// Track authorization events
+| auth_granted: [¬authorized ∧ d1==0 ∧ d2==0] / authorized=true
+| auth_revoked: [authorized] / authorized=false
+*/
+
+var
+    d1 = 0;   // 0=closed, 1=open
+    d2 = 0;   // FIXED: start closed
+    authorized = false;
+    mustOpenD1 = true;
+    sequence_phase = 0;  // 0=need_door1, 1=need_door2
+
+// Door 1 - can open when: its turn AND we're in phase 0 (need door1)
+| d1_c2o: [d1==0 ∧ authorized ∧ d2≠1 ∧ mustOpenD1 ∧ sequence_phase==0] /
+    d1=1; sequence_phase=1
+| d1_o2c: [d1==1] / d1=0  // FIXED: removed completion state
+
+// Door 2 - can open when: its turn AND we're in phase 1 (need door2) AND door1 closed
+| d2_c2o: [d2==0 ∧ authorized ∧ d1≠1 ∧ !mustOpenD1 ∧ sequence_phase==1] /
+    d2=1; mustOpenD1=true; sequence_phase=0
+| d2_o2c: [d2==1] / d2=0
+
+// Emergency sequence reset - if stuck needing door1 but it's not door1's turn
+| reset_to_phase0: [sequence_phase==1 ∧ mustOpenD1 ∧ d1==0 ∧ d2==0] /
+    sequence_phase=0  // FIXED: simpler reset
+
+// Emergency door2 access - if stuck needing door2
+| emergency_d2: [sequence_phase==1 ∧ authorized ∧ d1==0 ∧ d2==0] /
+    d2=1; mustOpenD1=true; sequence_phase=0
+
+// Authorization response
+| d1_force_close: [d1==1 ∧ !authorized] / d1=0
+
+// Environment
+| auth_granted: [¬authorized ∧ d1==0 ∧ d2==0] / authorized=true
+| auth_revoked: [authorized] / authorized=false

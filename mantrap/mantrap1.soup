@@ -1,0 +1,31 @@
+//The Mantrap Security System is a dual-door access control solution designed
+//to prevent unauthorized entry while maintaining secure perimeter control.
+//The system consists of two interlocked doors that must be traversed sequentially,
+//ensuring only one door can be open at any given time during normal operation.
+
+/*
+v1: add mutual exclusion
+ Each door checks a sensor reading on the state of the other door before opening.
+  - exclusion    = [] ¬(door1_open ∧ door2_open) //OK
+  - door1EventuallyOpensIfAuthorized = [] (authorized → ◇ d1_open) //Fails, d1 is starved by d2
+        + No Fairness Guarantees: The model doesn't ensure that if d1_c2o is continuously enabled, it will eventually execute
+        + Starvation: Door2 can "steal" the authorization every time
+        + No Sequencing: There's no requirement that Door1 gets priority or even gets a turn
+
+  In a real system, this could happen if:
+  - Door2's sensor is faster to respond
+  - Door2 has priority in the scheduling
+  - The control logic has an unfair arbitration policy
+*/
+
+// 0 = closed, 1 = open, 2 = ready-to-open
+var d1 = 0; d2= 0; authorized = false;
+//door1 behavior
+| d1_c2o : [d1 == 0 ∧ authorized ∧ d2 != 1] / d1 = 1
+| d1_o2c : [d1 == 1] / d1 = 0
+//door2 behavior
+| c2o2 : [d2 == 0 ∧ authorized ∧ d1 != 1] / d2 = 1
+| d2_o2c : [d2 == 1] / d2 = 0
+
+//environment: all authorization scenarios
+| auth_flip : / authorized = ! authorized

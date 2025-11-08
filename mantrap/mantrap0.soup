@@ -1,0 +1,21 @@
+//The Mantrap Security System is a dual-door access control solution designed
+//to prevent unauthorized entry while maintaining secure perimeter control.
+//The system consists of two interlocked doors that must be traversed sequentially,
+//ensuring only one door can be open at any given time during normal operation.
+
+//v0: Independent Doors (Naive Implementation)
+// Design: Two completely independent door controllers
+// Problem:
+// - exclusion    = [] ¬(door1_open ∧ door2_open) //Fails
+
+// 0 = closed, 1 = open
+var d1 = 0; d2= 0; authorized = false;
+//door1 behavior
+| d1_c2o : [d1 == 0 ∧ authorized] / d1 = 1
+| d1_o2c : [d1 == 1] / d1 = 0
+//door2 behavior
+| c2o2 : [d2 == 0 ∧ authorized] / d2 = 1
+| d2_o2c : [d2 == 1] / d2 = 0
+
+//environment: all authorization scenarios
+| auth_flip : / authorized = ! authorized

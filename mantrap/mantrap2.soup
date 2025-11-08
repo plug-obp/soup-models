@@ -1,0 +1,17 @@
+var
+    d1 = 0;
+    d2 = 0;
+    authorized = false;
+    mustOpenD1 = true;
+
+// Door 1 - gets priority on even counts
+| d1_c2o: [d1==0 ∧ authorized ∧ d2 ≠ 1 ∧ mustOpenD1] / d1=1; mustOpenD1=false
+| d1_o2c: [d1==1] / d1=0
+
+// Door 2 - gets priority on odd counts
+| d2_c2o: [d2==0 ∧ authorized ∧ d1 ≠ 1 ∧ !mustOpenD1] / d2=1; mustOpenD1=true
+| d2_o2c: [d2==1] / d2=0
+
+// Track authorization events
+| auth_granted: [¬authorized ∧ d1==0 ∧ d2==0] / authorized=true
+| auth_revoked: [authorized] / authorized=false
